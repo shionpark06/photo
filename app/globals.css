@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-notion-bg: #ffffff;
+  --color-notion-bg-hover: #f1f1f0;
+  --color-notion-border: #e2e2e2;
+  --color-notion-text: #37352f;
+  --color-notion-text-muted: #787774;
+}
+
+body {
+  background-color: var(--color-notion-bg);
+  color: var(--color-notion-text);
+  font-family: var(--font-sans);
+}
