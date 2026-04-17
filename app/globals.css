@@ -9,8 +9,41 @@
   --color-notion-text-muted: #787774;
 }
 
+:root {
+  --mobile-section-gap: clamp(2.5rem, 8vw, 4.5rem);
+}
+
 body {
   background-color: var(--color-notion-bg);
   color: var(--color-notion-text);
   font-family: var(--font-sans);
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-safe-px {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+.mobile-safe-pb {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.mobile-touch-target {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-chapter-gap {
+  margin-top: var(--mobile-section-gap);
 }

@@ -183,6 +183,10 @@ export default function BookPage() {
   };
 
   // --- Step Components ---
+  const stepTitleClass = 'text-2xl md:text-3xl font-medium tracking-tight mb-7 md:mb-8';
+  const actionRowClass = 'mt-8 md:mt-10 flex justify-stretch sm:justify-end';
+  const actionBtnClass = 'mobile-touch-target w-full sm:w-auto px-8 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors';
+  const actionBtnDisabledClass = 'mobile-touch-target w-full sm:w-auto px-8 bg-black text-white rounded-full font-medium disabled:opacity-50 transition-opacity hover:bg-black/80';
 
   const Step0_Auth = () => {
     const [mode, setMode] = useState<'signin' | 'signup'>('signup');
@@ -234,7 +238,7 @@ export default function BookPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-medium tracking-tight mb-2">Create Your Account</h2>
+          <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-2">Create Your Account</h2>
           <p className="text-sm text-gray-500 font-medium">You need an account to manage your booking.</p>
         </div>
 
@@ -299,11 +303,11 @@ export default function BookPage() {
             </div>
           )}
 
-          <div className="mt-10 flex justify-end">
+          <div className={actionRowClass}>
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-3 bg-black text-white rounded-full font-medium disabled:opacity-50 transition-opacity hover:bg-black/80"
+              className={actionBtnDisabledClass}
             >
               {submitting ? 'Please wait…' : mode === 'signup' ? 'Create Account' : 'Log In'}
             </button>
@@ -315,12 +319,12 @@ export default function BookPage() {
 
   const Step0_Plans = () => (
     <div className="space-y-4">
-      <h2 className="text-3xl font-medium tracking-tight mb-8">Select a Plan</h2>
+      <h2 className={stepTitleClass}>Select a Plan</h2>
       {plans.map((plan) => (
         <div
           key={plan.id}
           onClick={() => { updateBooking({ plan }); nextStep(); }}
-          className="p-6 border border-black/10 rounded-2xl hover:bg-black/5 cursor-pointer transition-colors flex justify-between items-center group bg-white"
+          className="p-5 md:p-6 border border-black/10 rounded-2xl hover:bg-black/5 cursor-pointer transition-colors flex justify-between items-center group bg-white gap-4"
         >
           <div>
             <h3 className="font-medium text-xl text-black">{plan.name}</h3>
@@ -342,7 +346,7 @@ export default function BookPage() {
 
   const Step1_Location = () => (
     <div className="space-y-4">
-      <h2 className="text-3xl font-medium tracking-tight mb-8">Choose Location</h2>
+      <h2 className={stepTitleClass}>Choose Location</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {locations.map((loc) => (
           <div
@@ -357,11 +361,11 @@ export default function BookPage() {
           </div>
         ))}
       </div>
-      <div className="mt-10 flex justify-end">
+      <div className={actionRowClass}>
         <button
           onClick={nextStep}
           disabled={!booking.location}
-          className="px-8 py-3 bg-black text-white rounded-full font-medium disabled:opacity-50 transition-opacity hover:bg-black/80"
+          className={actionBtnDisabledClass}
         >
           Continue
         </button>
@@ -380,8 +384,8 @@ export default function BookPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h2 className="text-3xl font-medium tracking-tight mb-2">Schedule Session</h2>
-          <p className="text-sm text-gray-500 font-medium mb-8">Bookings require at least 48 hours notice.</p>
+          <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-2">Schedule Session</h2>
+          <p className="text-sm text-gray-500 font-medium mb-6 md:mb-8">Bookings require at least 48 hours notice.</p>
         </div>
         
         <div>
@@ -393,7 +397,7 @@ export default function BookPage() {
                 <div
                   key={d.toISOString()}
                   onClick={() => updateBooking({ date: d, time: null })}
-                  className={`snap-start shrink-0 w-24 p-4 border rounded-2xl cursor-pointer text-center transition-colors ${isSelected ? 'border-black bg-black text-white' : 'border-black/10 hover:bg-black/5 bg-white text-black'}`}
+                  className={`snap-start shrink-0 w-[5.5rem] md:w-24 p-3.5 md:p-4 border rounded-2xl cursor-pointer text-center transition-colors ${isSelected ? 'border-black bg-black text-white' : 'border-black/10 hover:bg-black/5 bg-white text-black'}`}
                 >
                   <div className="text-xs uppercase mb-1 opacity-80 font-medium">{format(d, 'EEE')}</div>
                   <div className="text-2xl font-medium">{format(d, 'd')}</div>
@@ -412,7 +416,7 @@ export default function BookPage() {
             ) : availableSlots.length === 0 ? (
               <p className="text-sm text-gray-500 font-medium">No photographers available for this date and location. Please pick another date.</p>
             ) : (
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {availableSlots.map((t) => (
                   <div
                     key={t}
@@ -430,8 +434,8 @@ export default function BookPage() {
         {booking.time && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="pt-6 border-t border-black/10">
             <h3 className="font-medium mb-4 text-black text-lg">Need more time?</h3>
-            <div className="flex items-center justify-between p-5 border border-black/10 rounded-2xl bg-white">
-              <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-black/10 rounded-2xl bg-white gap-4">
+              <div className="pr-2">
                 <div className="font-medium text-black">Extend Session</div>
                 <div className="text-sm text-gray-500">+$100 per 30 mins</div>
               </div>
@@ -450,11 +454,11 @@ export default function BookPage() {
           </motion.div>
         )}
 
-        <div className="mt-10 flex justify-end">
+        <div className={actionRowClass}>
           <button
             onClick={nextStep}
             disabled={!booking.date || !booking.time}
-            className="px-8 py-3 bg-black text-white rounded-full font-medium disabled:opacity-50 transition-opacity hover:bg-black/80"
+            className={actionBtnDisabledClass}
           >
             Continue
           </button>
@@ -465,9 +469,9 @@ export default function BookPage() {
 
   const Step3_GroupSize = () => (
     <div className="space-y-6">
-      <h2 className="text-3xl font-medium tracking-tight mb-8">Group Size</h2>
-      <div className="p-6 border border-black/10 rounded-2xl flex items-center justify-between bg-white">
-        <div className="flex items-center gap-4">
+      <h2 className={stepTitleClass}>Group Size</h2>
+      <div className="p-5 md:p-6 border border-black/10 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-5 bg-white">
+        <div className="flex items-start md:items-center gap-4">
           <div className="w-12 h-12 bg-black/5 rounded-full flex items-center justify-center">
             <Users size={24} className="text-gray-500" />
           </div>
@@ -488,8 +492,8 @@ export default function BookPage() {
           >+</button>
         </div>
       </div>
-      <div className="mt-10 flex justify-end">
-        <button onClick={nextStep} className="px-8 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors">Continue</button>
+      <div className={actionRowClass}>
+        <button onClick={nextStep} className={actionBtnClass}>Continue</button>
       </div>
     </div>
   );
@@ -508,7 +512,7 @@ export default function BookPage() {
 
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-medium tracking-tight mb-8">Enhance Your Session</h2>
+        <h2 className={stepTitleClass}>Enhance Your Session</h2>
         <div className="space-y-3">
           {addonList.map(addon => {
             const isSelected = booking.addons.some(a => a.id === addon.id);
@@ -562,8 +566,8 @@ export default function BookPage() {
           )}
         </AnimatePresence>
 
-        <div className="mt-10 flex justify-end">
-          <button onClick={nextStep} className="px-8 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors">Continue</button>
+        <div className={actionRowClass}>
+          <button onClick={nextStep} className={actionBtnClass}>Continue</button>
         </div>
       </div>
     );
@@ -574,7 +578,7 @@ export default function BookPage() {
     
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-medium tracking-tight mb-8">Your Details</h2>
+        <h2 className={stepTitleClass}>Your Details</h2>
         <div className="space-y-5">
           <div>
             <label className="block text-sm font-medium mb-2 text-black">Full Name *</label>
@@ -625,11 +629,11 @@ export default function BookPage() {
             />
           </div>
         </div>
-        <div className="mt-10 flex justify-end">
+        <div className={actionRowClass}>
           <button
             onClick={nextStep}
             disabled={!isValid}
-            className="px-8 py-3 bg-black text-white rounded-full font-medium disabled:opacity-50 transition-opacity hover:bg-black/80"
+            className={actionBtnDisabledClass}
           >
             Review Booking
           </button>
@@ -643,7 +647,7 @@ export default function BookPage() {
     
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-medium tracking-tight mb-8">Review & Confirm</h2>
+        <h2 className={stepTitleClass}>Review & Confirm</h2>
         
         <div className="border border-black/10 rounded-2xl overflow-hidden bg-white">
           <div className="bg-black/5 p-6 border-b border-black/10">
@@ -702,11 +706,11 @@ export default function BookPage() {
           </div>
         </div>
 
-        <div className="mt-10 flex justify-end">
+        <div className={actionRowClass}>
           <button
             onClick={nextStep}
             disabled={!booking.agreedToPolicy}
-            className="px-8 py-3 bg-black text-white rounded-full font-medium disabled:opacity-50 transition-opacity hover:bg-black/80"
+            className={actionBtnDisabledClass}
           >
             Proceed to Payment
           </button>
@@ -720,7 +724,7 @@ export default function BookPage() {
       <div className="w-20 h-20 bg-black/5 rounded-full flex items-center justify-center mx-auto mb-6">
         <CreditCard size={32} className="text-black" />
       </div>
-      <h2 className="text-3xl font-medium tracking-tight mb-4 text-black">Complete Payment</h2>
+      <h2 className="text-2xl md:text-3xl font-medium tracking-tight mb-4 text-black">Complete Payment</h2>
       <p className="text-gray-500 mb-10 font-medium">
         Please complete your payment of <strong className="text-black">${calculateTotal()}</strong> via KakaoPay to secure your booking.
       </p>
@@ -757,7 +761,7 @@ export default function BookPage() {
       <div className="w-24 h-24 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8">
         <Check size={48} />
       </div>
-      <h2 className="text-4xl font-medium tracking-tight mb-4 text-black">Booking Confirmed!</h2>
+      <h2 className="text-3xl md:text-4xl font-medium tracking-tight mb-4 text-black">Booking Confirmed!</h2>
       <p className="text-gray-500 mb-10 font-medium max-w-md mx-auto">
         Thank you, {booking.clientInfo.name}. We&apos;ll contact you within 24 hours to confirm your session details.
       </p>
@@ -786,7 +790,7 @@ export default function BookPage() {
   const CurrentStep = steps[step];
 
   return (
-    <main className="min-h-screen bg-[#fcfcfc] pt-32 pb-24 text-black selection:bg-black selection:text-white">
+    <main className="min-h-screen bg-[#fcfcfc] pt-24 md:pt-32 pb-20 md:pb-24 text-black selection:bg-black selection:text-white">
       {/* Progress Bar */}
       {step < 9 && (
         <div className="w-full h-1 bg-black/5 fixed top-0 left-0 z-40">
@@ -799,12 +803,12 @@ export default function BookPage() {
         </div>
       )}
 
-      <div className="w-full max-w-3xl mx-auto px-6">
+      <div className="w-full max-w-3xl mx-auto px-4 md:px-6">
         {/* Header */}
-        <div className="mb-12 flex items-center justify-between">
+        <div className="mb-8 md:mb-12 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {step > (user ? 1 : 0) && step < 9 && (
-              <button onClick={prevStep} className="p-2 hover:bg-black/5 rounded-full transition-colors text-black">
+              <button onClick={prevStep} className="p-2.5 hover:bg-black/5 rounded-full transition-colors text-black">
                 <ChevronLeft size={20} />
               </button>
             )}

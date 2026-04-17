@@ -2,54 +2,83 @@
 
 import Gallery from '@/components/Gallery';
 import Preloader from '@/components/Preloader';
+import TestimonialsScroll from '@/components/TestimonialsScroll';
+import CTASection from '@/components/CTASection';
+import { PhotoGallery } from '@/components/ui/gallery';
 import { Search, Play } from 'lucide-react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { useRef } from 'react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { useScroll, useTransform, motion } from 'motion/react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-const FLOATING_IMAGES = [
-  { id: 1, top: '10%', left: '15%', rotate: -15, width: 80, height: 100, blur: 'blur-[2px]', opacity: 0.8 },
-  { id: 2, top: '25%', left: '25%', rotate: 10, width: 100, height: 120, blur: 'blur-none', opacity: 1 },
-  { id: 3, top: '40%', left: '8%', rotate: -5, width: 120, height: 90, blur: 'blur-sm', opacity: 0.6 },
-  { id: 4, top: '55%', left: '18%', rotate: 20, width: 90, height: 110, blur: 'blur-none', opacity: 0.9 },
-  { id: 5, top: '15%', left: '40%', rotate: -25, width: 70, height: 70, blur: 'blur-md', opacity: 0.5 },
-  { id: 6, top: '75%', left: '12%', rotate: -10, width: 110, height: 130, blur: 'blur-none', opacity: 1 },
-  { id: 7, top: '85%', left: '25%', rotate: 15, width: 80, height: 100, blur: 'blur-sm', opacity: 0.7 },
-  { id: 8, top: '65%', left: '5%', rotate: 5, width: 90, height: 90, blur: 'blur-[2px]', opacity: 0.8 },
-  { id: 9, top: '90%', left: '40%', rotate: -20, width: 100, height: 80, blur: 'blur-md', opacity: 0.4 },
-  { id: 10, top: '80%', left: '35%', rotate: 25, width: 70, height: 90, blur: 'blur-none', opacity: 0.9 },
-  { id: 11, top: '12%', left: '85%', rotate: 15, width: 90, height: 120, blur: 'blur-none', opacity: 1 },
-  { id: 12, top: '25%', left: '70%', rotate: -10, width: 110, height: 90, blur: 'blur-sm', opacity: 0.7 },
-  { id: 13, top: '40%', left: '90%', rotate: 20, width: 80, height: 100, blur: 'blur-[2px]', opacity: 0.8 },
-  { id: 14, top: '20%', left: '55%', rotate: -15, width: 70, height: 70, blur: 'blur-md', opacity: 0.5 },
-  { id: 15, top: '50%', left: '80%', rotate: -5, width: 100, height: 130, blur: 'blur-none', opacity: 0.9 },
-  { id: 16, top: '65%', left: '85%', rotate: -15, width: 120, height: 90, blur: 'blur-none', opacity: 1 },
-  { id: 17, top: '80%', left: '70%', rotate: 10, width: 90, height: 110, blur: 'blur-sm', opacity: 0.7 },
-  { id: 18, top: '90%', left: '90%', rotate: -20, width: 80, height: 80, blur: 'blur-[2px]', opacity: 0.8 },
-  { id: 19, top: '95%', left: '55%', rotate: 15, width: 100, height: 120, blur: 'blur-md', opacity: 0.4 },
-  { id: 20, top: '70%', left: '60%', rotate: -25, width: 70, height: 90, blur: 'blur-none', opacity: 0.9 },
+interface MobileHeroLayer {
+  src: string;
+  alt: string;
+  className: string;
+}
+
+interface MobileEditorialFrame {
+  src: string;
+  alt: string;
+  className: string;
+}
+
+const MOBILE_HERO_LAYERS: MobileHeroLayer[] = [
+  {
+    src: 'https://picsum.photos/seed/mobilehero1/900/1200',
+    alt: 'Seoul portrait on stairs',
+    className: 'left-1 top-12 h-[47svh] w-[43vw] rotate-[-7deg]',
+  },
+  {
+    src: 'https://picsum.photos/seed/mobilehero2/900/1200',
+    alt: 'Neon evening portrait',
+    className: 'left-[28vw] top-7 h-[43svh] w-[42vw] rotate-[4deg]',
+  },
+  {
+    src: 'https://picsum.photos/seed/mobilehero3/900/1200',
+    alt: 'Editorial close-up shot',
+    className: 'right-1 top-14 h-[49svh] w-[38vw] rotate-[9deg]',
+  },
 ];
 
-export default function Home() {
+const MOBILE_EDITORIAL_FRAMES: MobileEditorialFrame[] = [
+  {
+    src: 'https://picsum.photos/seed/fashion1/600/800',
+    alt: 'Fashion editorial 1',
+    className: 'left-[6%] top-[14%] h-[52%] w-[33%] rotate-[-6deg]',
+  },
+  {
+    src: 'https://picsum.photos/seed/fashion2/400/600',
+    alt: 'Fashion editorial 2',
+    className: 'left-[35%] top-[22%] h-[46%] w-[28%] rotate-[3deg]',
+  },
+  {
+    src: 'https://picsum.photos/seed/fashion3/800/1200',
+    alt: 'Fashion editorial 3',
+    className: 'right-[5%] top-[10%] h-[74%] w-[36%] rotate-[8deg]',
+  },
+];
+
+function DesktopLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end end'] as const
+    offset: ['start start', 'end end'] as const,
   });
 
   // Move hero content up like normal scroll
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const heroY = useTransform(scrollYProgress, [0, 0.5], ["0vh", "-125vh"]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], ['0vh', '-125vh']);
 
   // Expand video container
-  const videoWidth = useTransform(scrollYProgress, [0, 0.5], ["40vw", "85vw"]);
-  const videoHeight = useTransform(scrollYProgress, [0, 0.5], ["30vh", "82vh"]);
-  const videoBottom = useTransform(scrollYProgress, [0, 0.5], ["-22vh", "8vh"]);
-  const videoBorderRadius = useTransform(scrollYProgress, [0, 0.5], ["24px", "32px"]);
+  const videoWidth = useTransform(scrollYProgress, [0, 0.5], ['35vw', '86vw']);
+  const videoHeight = useTransform(scrollYProgress, [0, 0.5], ['25vh', '78vh']);
+  const videoBottom = useTransform(scrollYProgress, [0, 0.5], ['-28vh', '8vh']);
+  const videoBorderRadius = useTransform(scrollYProgress, [0, 0.5], ['24px', '32px']);
 
   // Fade in the text quickly as the image reaches full size
-  const videoContentOpacity = useTransform(scrollYProgress, [0.2, 0.4], [0, 1]);
+  const videoContentOpacity = useTransform(scrollYProgress, [0.25, 0.45], [0, 1]);
 
   return (
     <main className="min-h-screen bg-[#fcfcfc] text-notion-text selection:bg-notion-text selection:text-white">
@@ -57,69 +86,14 @@ export default function Home() {
 
       {/* Cosmos-style Hero Section with Scroll Animation */}
       <div ref={containerRef} className="h-[250vh] relative">
-        <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
+        <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center pt-[96px]">
 
           {/* Hero Content that fades out */}
           <motion.div
             style={{ opacity: heroOpacity, y: heroY }}
-            className="absolute inset-0 flex flex-col items-center justify-center"
+            className="absolute inset-0 flex flex-col items-center justify-center px-6 pt-[96px]"
           >
-            {/* Floating Images Background */}
-            <div className="absolute inset-0 pointer-events-none z-0">
-              {FLOATING_IMAGES.map((img) => (
-                <div
-                  key={img.id}
-                  className={`absolute rounded-2xl overflow-hidden shadow-sm ${img.blur}`}
-                  style={{
-                    top: img.top,
-                    left: img.left,
-                    width: img.width,
-                    height: img.height,
-                    transform: `rotate(${img.rotate}deg)`,
-                    opacity: img.opacity,
-                  }}
-                >
-                  <Image
-                    src={`https://picsum.photos/seed/cosmos${img.id}/${img.width * 2}/${img.height * 2}`}
-                    alt="Floating inspiration"
-                    fill
-                    className="object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Center Content */}
-            <div className="relative z-10 flex flex-col items-center text-center px-6 -mt-24">
-              <span className="text-sm font-bold tracking-[0.2em] uppercase mb-6 text-black">
-                SHION STUDIO
-              </span>
-              <h1 className="text-[56px] md:text-[68px] leading-[1.05] font-normal tracking-tight mb-10 text-black">
-                Cinematic<br />Seoul Moments
-              </h1>
-
-              <div className="flex items-center gap-4">
-                <Link
-                  href="/book"
-                  className="h-12 rounded-full bg-black text-white px-8 flex items-center justify-center text-sm font-medium hover:bg-black/80 transition-colors"
-                >
-                  Book a session
-                </Link>
-                <Link
-                  href="#plans"
-                  className="h-12 rounded-full bg-white/80 backdrop-blur-sm border border-black/10 text-black px-8 flex items-center justify-center text-sm font-medium hover:bg-white transition-colors shadow-sm"
-                >
-                  View portfolio
-                </Link>
-              </div>
-            </div>
-
-            {/* Bottom Text */}
-            <div className="absolute bottom-[20vh] left-1/2 -translate-x-1/2 z-10 flex items-center gap-3 text-sm font-medium text-gray-600 hover:text-black cursor-pointer transition-colors">
-              <Play size={16} className="fill-current" />
-              <span>Experience our craft</span>
-            </div>
+            <PhotoGallery animationDelay={1.8} />
           </motion.div>
 
           {/* Expanding Video Container */}
@@ -142,7 +116,7 @@ export default function Home() {
             />
             <motion.div
               style={{ opacity: videoContentOpacity }}
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 z-10 bg-black/40 flex items-center justify-center pointer-events-none"
             >
               <div className="absolute inset-0 flex items-center justify-between px-12 md:px-24 text-white">
                 <div className="flex items-center gap-4 md:gap-6">
@@ -161,13 +135,13 @@ export default function Home() {
       </div>
 
       {/* Cosmos-style Showcase Section */}
-      <section className="px-6 max-w-7xl mx-auto pb-24 pt-10">
-        <h2 className="text-4xl md:text-[56px] font-medium tracking-tighter text-center mb-12 text-notion-text">
+      <section className="px-6 max-w-7xl mx-auto h-[100svh] min-h-[600px] max-h-[1000px] flex flex-col justify-center pt-[96px] pb-12">
+        <h2 className="text-[clamp(32px,5vw,56px)] font-medium tracking-tight text-center mb-8 md:mb-12 text-notion-text">
           Every shot tells your unique story.
         </h2>
 
         {/* Main Card */}
-        <div className="relative w-full h-[400px] md:h-[600px] rounded-[32px] bg-[#452c2e] overflow-hidden shadow-sm">
+        <div className="relative w-full flex-1 max-h-[60vh] rounded-[32px] bg-[#452c2e] overflow-hidden shadow-sm">
 
           {/* Left Image */}
           <div className="absolute left-[12%] top-[15%] bottom-[15%] w-[22%] rounded-sm overflow-hidden">
@@ -210,7 +184,7 @@ export default function Home() {
         </div>
 
         {/* Bottom Text */}
-        <div className="mt-16 text-center">
+        <div className="mt-8 md:mt-12 text-center">
           <p className="text-xl md:text-[26px] text-notion-text-muted font-medium leading-snug tracking-tight">
             Your style, your memories, your Seoul.<br />
             Professionally captured, uniquely yours.
@@ -219,25 +193,25 @@ export default function Home() {
       </section>
 
       {/* Feature Section: Know what you're looking at */}
-      <section className="py-32 bg-[#fcfcfc] overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-6">
+      <section className="h-[100svh] min-h-[700px] max-h-[1000px] flex flex-col justify-center bg-[#fcfcfc] overflow-hidden pt-[96px] pb-12">
+        <div className="max-w-[1400px] mx-auto px-6 w-full">
           {/* Top text */}
-          <div className="flex justify-between items-center mb-24 md:mb-32">
-            <h3 className="text-2xl md:text-[28px] font-medium tracking-tight text-black">Natural light.</h3>
-            <h3 className="text-2xl md:text-[28px] font-medium tracking-tight text-black">True results.</h3>
+          <div className="flex justify-between items-center mb-12 md:mb-16">
+            <h3 className="text-xl md:text-[24px] font-medium tracking-tight text-notion-text">Natural light.</h3>
+            <h3 className="text-xl md:text-[24px] font-medium tracking-tight text-notion-text">True results.</h3>
           </div>
 
           {/* 3 Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
             {/* Left Text */}
             <div className="flex lg:justify-end text-center lg:text-right">
-              <h2 className="text-[56px] md:text-[80px] leading-[0.95] font-medium tracking-tight text-black">
+              <h2 className="text-[48px] md:text-[64px] leading-[0.95] font-medium tracking-tight text-black">
                 Crafting<br />the perfect<br />frame.
               </h2>
             </div>
 
             {/* Center Image */}
-            <div className="relative w-full max-w-md mx-auto aspect-[3/4] md:aspect-[4/5] rounded-[24px] overflow-hidden shadow-lg">
+            <div className="relative w-full max-w-[320px] lg:max-w-md mx-auto aspect-[3/4] rounded-[24px] overflow-hidden shadow-lg">
               <Image
                 src="https://picsum.photos/seed/interior/800/1000"
                 alt="Interior Design"
@@ -258,7 +232,7 @@ export default function Home() {
 
             {/* Right Text */}
             <div className="flex lg:justify-start text-center lg:text-left">
-              <p className="text-2xl md:text-[32px] leading-[1.1] font-medium text-gray-500 max-w-sm mx-auto lg:mx-0">
+              <p className="text-xl md:text-[28px] leading-[1.2] font-medium text-notion-text-muted max-w-sm mx-auto lg:mx-0">
                 Our studio specializes in high-end, aesthetic portraits that capture the real you in Seoul&apos;s iconic settings.
               </p>
             </div>
@@ -268,6 +242,206 @@ export default function Home() {
 
       {/* GSAP Gallery Section (Now Plans) */}
       <Gallery />
+
+      {/* Testimonials Horizontal Scroll */}
+      <TestimonialsScroll />
+
+      {/* CTA Section with ImageTrail */}
+      <CTASection />
     </main>
   );
+}
+
+function MobileLanding() {
+  const stickyCtaStopRef = useRef<HTMLDivElement>(null);
+  const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
+  const [isNearCta, setIsNearCta] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setHasScrolledPastHero(window.scrollY > window.innerHeight * 0.7);
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!stickyCtaStopRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsNearCta(entry.isIntersecting);
+      },
+      { rootMargin: '-25% 0px -25% 0px' }
+    );
+
+    observer.observe(stickyCtaStopRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const showStickyCta = hasScrolledPastHero && !isNearCta;
+
+  return (
+    <main className="min-h-screen bg-[#fcfcfc] text-notion-text selection:bg-notion-text selection:text-white md:hidden">
+      <Preloader />
+
+      <section className="relative min-h-[100svh] overflow-hidden px-4 pb-10 pt-26">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[70svh] bg-[radial-gradient(circle_at_top,#d8d4ce_0%,rgba(252,252,252,0.15)_65%,transparent_95%)]" />
+        <p className="relative z-10 text-center text-[11px] font-semibold uppercase tracking-[0.24em] text-black/45">Shion Studio · Seoul</p>
+        <h1 className="relative z-10 mx-auto mt-4 max-w-[13ch] text-center text-[clamp(2.25rem,10vw,3.8rem)] font-medium leading-[0.95] tracking-tight text-black">
+          Cinematic Seoul Moments
+        </h1>
+        <p className="relative z-10 mx-auto mt-5 max-w-[28ch] text-center text-sm leading-relaxed text-black/65">
+          Seoul sessions shaped like an editorial story, designed for travelers who want frames that feel timeless.
+        </p>
+
+        <div className="relative mt-6 h-[54svh] min-h-[350px]">
+          {MOBILE_HERO_LAYERS.map((layer) => (
+            <motion.div
+              key={layer.src}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              className={`absolute overflow-hidden rounded-[28px] border border-black/10 bg-white shadow-[0_16px_48px_rgba(0,0,0,0.16)] ${layer.className}`}
+            >
+              <Image
+                src={layer.src}
+                alt={layer.alt}
+                fill
+                className="object-cover"
+                referrerPolicy="no-referrer"
+                sizes="50vw"
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="relative z-10 mt-3 flex items-center justify-center gap-3">
+          <Link href="/book" className="mobile-touch-target inline-flex rounded-full bg-black px-6 text-sm font-medium text-white">
+            Book a session
+          </Link>
+          <Link href="#plans" className="mobile-touch-target inline-flex rounded-full border border-black/15 bg-white px-6 text-sm font-medium text-black">
+            View portfolio
+          </Link>
+        </div>
+      </section>
+
+      <section className="px-4 py-14">
+        <div className="rounded-[30px] bg-black p-3 shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[24px]">
+            <Image
+              src="https://picsum.photos/seed/fashionvideo/1920/1080"
+              alt="Our vision cinematic film"
+              fill
+              className="object-cover"
+              referrerPolicy="no-referrer"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+            <div className="absolute inset-x-5 bottom-6 text-white">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] uppercase tracking-[0.2em]">
+                <Play size={13} className="fill-current" />
+                Watch reel
+              </div>
+              <h2 className="text-[clamp(1.9rem,8vw,2.8rem)] font-medium leading-[0.95] tracking-tight">Our Vision</h2>
+              <p className="mt-2 text-xs uppercase tracking-[0.2em] text-white/75">Seoul &apos;24 Collection</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-14">
+        <h2 className="text-center text-[clamp(1.8rem,8vw,2.8rem)] font-medium leading-[0.98] tracking-tight text-black">
+          Every shot tells your unique story.
+        </h2>
+
+        <div className="relative mt-8 h-[56svh] min-h-[420px] overflow-hidden rounded-[32px] bg-[#452c2e]">
+          {MOBILE_EDITORIAL_FRAMES.map((frame) => (
+            <div key={frame.src} className={`absolute overflow-hidden rounded-[18px] shadow-xl ${frame.className}`}>
+              <Image src={frame.src} alt={frame.alt} fill className="object-cover" referrerPolicy="no-referrer" sizes="40vw" />
+            </div>
+          ))}
+
+          <div className="absolute bottom-6 left-1/2 z-10 flex h-11 w-[82%] -translate-x-1/2 items-center gap-2 rounded-full border border-white/15 bg-gradient-to-r from-[#3a2224]/80 to-[#2a1a1c]/80 px-4 text-white shadow-2xl">
+            <Search size={16} className="text-white/80" />
+            <span className="text-sm font-medium text-white/90">bukchon nights</span>
+          </div>
+        </div>
+
+        <p className="mx-auto mt-8 max-w-[26ch] text-center text-lg font-medium leading-snug tracking-tight text-notion-text-muted">
+          Your style, your memories, your Seoul. Professionally captured, uniquely yours.
+        </p>
+      </section>
+
+      <section className="px-4 pb-16">
+        <div className="rounded-[30px] border border-black/10 bg-[linear-gradient(180deg,#f5f4f2_0%,#ffffff_58%)] p-5">
+          <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-black/45">
+            <span>Natural light</span>
+            <span>True results</span>
+          </div>
+
+          <div className="mt-6 grid gap-5">
+            <h2 className="max-w-[12ch] text-[clamp(2rem,9vw,3.2rem)] font-medium leading-[0.92] tracking-tight text-black">
+              Crafting the perfect frame.
+            </h2>
+
+            <div className="relative mx-auto aspect-[3/4] w-[78vw] max-w-[320px] overflow-hidden rounded-[22px] shadow-lg">
+              <Image
+                src="https://picsum.photos/seed/interior/800/1000"
+                alt="Seoul portrait lighting setup"
+                fill
+                className="object-cover"
+                referrerPolicy="no-referrer"
+                sizes="80vw"
+              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/10 p-4 text-center">
+                <span className="rounded-full border border-white/50 bg-white/30 px-4 py-2 text-xs font-medium text-white backdrop-blur-md">
+                  Street style in Myeongdong
+                </span>
+                <span className="rounded-full border border-white/50 bg-white/30 px-4 py-2 text-xs font-medium text-white backdrop-blur-md">
+                  Captured by Shion Studio
+                </span>
+              </div>
+            </div>
+
+            <p className="text-lg font-medium leading-[1.25] tracking-tight text-notion-text-muted">
+              Our studio specializes in high-end, aesthetic portraits that capture the real you in Seoul&apos;s iconic settings.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Gallery />
+      <TestimonialsScroll />
+
+      <div ref={stickyCtaStopRef} className="h-px" aria-hidden />
+      <CTASection />
+
+      {showStickyCta && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="mx-auto max-w-md rounded-full border border-black/10 bg-white/92 p-1 shadow-[0_14px_40px_rgba(0,0,0,0.2)] backdrop-blur-md">
+            <Link
+              href="/book"
+              className="pointer-events-auto mobile-touch-target flex w-full items-center justify-center rounded-full bg-black px-6 text-sm font-semibold tracking-[0.02em] text-white"
+            >
+              Book now
+            </Link>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}
+
+export default function Home() {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return <MobileLanding />;
+  }
+
+  return <DesktopLanding />;
 }
